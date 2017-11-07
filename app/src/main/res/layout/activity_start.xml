@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorNeutral"
+    android:orientation="horizontal"
+    tools:background="@color/colorNeutral"
+    tools:context="com.example.stphanie.sudoku.StartActivity">
+
+    <RelativeLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+
+        <ImageView
+            android:id="@+id/ivGameTitle"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="54dp"
+            app:srcCompat="@drawable/title" />
+
+        <TextView
+            android:id="@+id/tvGameTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/ivGameTitle"
+            android:layout_alignLeft="@+id/ivGameTitle"
+            android:layout_alignRight="@+id/ivGameTitle"
+            android:layout_alignTop="@+id/ivGameTitle"
+            android:layout_margin="1dp"
+            android:gravity="center"
+            android:text="Puzzles"
+            android:textSize="30dp" />
+
+        <Button
+            android:id="@+id/ibPuzzleResume"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ivGameTitle"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="30dp"
+            android:background="@drawable/button"
+            android:text="Resume" />
+
+        <Button
+            android:id="@+id/ibDiffEasy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ibPuzzleResume"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="15dp"
+            android:background="@drawable/button"
+            android:text="Easy" />
+
+        <Button
+            android:id="@+id/ibDiffMedium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ibDiffEasy"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="15dp"
+            android:background="@drawable/button"
+            android:text="Medium" />
+
+        <Button
+            android:id="@+id/ibDiffHard"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ibDiffMedium"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="15dp"
+            android:background="@drawable/button"
+            android:text="Hard" />
+
+        <Button
+            android:id="@+id/ibDiffNightmare"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ibDiffHard"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="15dp"
+            android:background="@drawable/button"
+            android:text="Nightmare" />
+
+
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+
+        <ImageView
+            android:id="@+id/ivStatsTitle"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="54dp"
+            app:srcCompat="@drawable/title" />
+
+        <TextView
+            android:id="@+id/tvStatsTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/ivStatsTitle"
+            android:layout_alignLeft="@+id/ivStatsTitle"
+            android:layout_alignRight="@+id/ivStatsTitle"
+            android:layout_alignTop="@+id/ivStatsTitle"
+            android:layout_margin="1dp"
+            android:gravity="center"
+            android:text="Statistics"
+            android:textSize="30dp" />
+
+        <Button
+            android:id="@+id/ibHistory"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ivStatsTitle"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="30dp"
+            android:background="@drawable/button"
+            android:text="History" />
+
+        <Button
+            android:id="@+id/ibRecords"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ibHistory"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="15dp"
+            android:background="@drawable/button"
+            android:text="Records" />
+
+        <Button
+            android:id="@+id/ibSettings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ibRecords"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="15dp"
+            android:background="@drawable/button"
+            android:text="Settings" />
+
+
+    </RelativeLayout>
+
+
+</LinearLayout>
