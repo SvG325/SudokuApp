@@ -22,11 +22,11 @@ import android.widget.Toast;
 public class PuzzleView extends View implements View.OnTouchListener{
     private Rect[][] board;
     private RectF[][] digits;
-    private int selectedI, selectedJ, digitI, digitJ, digitWidth;
+    private int selectedI, selectedJ, digitI, digitJ, digitWidth, selectedDigit;
     Grid grid;
     Paint paint;
-    boolean blnBigSquare;
-    boolean blnCellFirst;
+    boolean blnEraser;
+    boolean blnCellFirst, blnCellSelected;
 
     int canvasWidth, canvasHeight, puzzleWidth;
     int outerMargin, lineWidthA, lineWidthB;
@@ -42,8 +42,10 @@ public class PuzzleView extends View implements View.OnTouchListener{
         selectedJ = -1;
         digitI = -1;
         digitJ = -1;
-        blnBigSquare = true;
+        selectedDigit = -1;
+        blnCellSelected = false;
         blnCellFirst = true;
+        blnEraser = false;
         setOnTouchListener(this);
     }
 
@@ -70,10 +72,17 @@ public class PuzzleView extends View implements View.OnTouchListener{
         currY = currX;
         for(int i=0; i<9;i++){
             for(int j=0;j<9;j++){
-                if((selectedI != -1 && i == selectedI) || ((selectedJ != -1 && j == selectedJ))){
-                    paint.setColor(Color.YELLOW);
-                }else
-                    paint.setColor(Color.WHITE);
+                if(blnCellFirst) {
+                    if ((selectedI != -1 && i == selectedI) || ((selectedJ != -1 && j == selectedJ))) {
+                        paint.setColor(Color.YELLOW);
+                    } else
+                        paint.setColor(Color.WHITE);
+                }else{
+                    if(selectedDigit != -1 && grid.getCell(i,j).getValue() == selectedDigit)
+                        paint.setColor(Color.YELLOW);
+                    else
+                        paint.setColor(Color.WHITE);
+                }
 
                 canvas.drawRect(new android.graphics.Rect(currX,currY,currX+cellWidth,currY+cellWidth), paint);
 
@@ -115,7 +124,7 @@ public class PuzzleView extends View implements View.OnTouchListener{
         paint.setColor(Color.WHITE);
         for(int i=0; i<2;i++){
             for(int j=0;j<6;j++){
-                if((digitI != -1 && i == digitI) && ((digitJ != -1 && j == digitJ))){
+                if((digitI != -1 && i == digitI) && ((digitJ != -1 && j == digitJ)) && (i == 0 || (j != 5 && j!=3))){
                     paint.setColor(Color.YELLOW);
                 }else
                     paint.setColor(Color.WHITE);
@@ -148,12 +157,18 @@ public class PuzzleView extends View implements View.OnTouchListener{
                 paint.getTextBounds(text, 0, text.length(), r);
                 yPos = gc.top + r.height() + ((cellWidth- r.height())/2);
                 int value = grid.getCell(i,j).getValue();
-                if(value != 0)
-                    canvas.drawText("" + value, gc.left+ cellWidth/2, yPos ,paint);
+                if(value != 0) {
+                    if(grid.getCell(i,j).getPreset())
+                        paint.setColor(Color.BLACK);
+                    else
+                        paint.setColor(Color.rgb(102,102,153));
+                    canvas.drawText("" + value, gc.left + cellWidth / 2, yPos, paint);
+                }
             }
         }
         int counter = 1;
         sizeText((int) digits[0][0].height());
+        paint.setColor(Color.BLACK);
         for(int i=0; i<2;i++){
             for(int j=0;j<6;j++) {
                 RectF digit = digits[i][j];
@@ -162,23 +177,7 @@ public class PuzzleView extends View implements View.OnTouchListener{
                 if(counter < 10)
                     canvas.drawText("" + counter, (int) digit.left+ (digitWidth)/2, yPos ,paint);
                 else if(counter == 10){
-                    Rect target = new Rect();
-                    digit.round(target);
-                    target.left = target.left + ((int) (digitWidth * 0.1));
-                    target.top = target.top + ((int) (digitWidth * 0.1));
-                    if(blnBigSquare) {
-                        target.right = target.right - ((int) (digitWidth * 0.1));
-                        target.bottom = target.bottom - ((int) (digitWidth * 0.1));
-                    } else{
-                        target.right = target.left + ((int) (digitWidth * 0.3));
-                        target.bottom = target.top + ((int) (digitWidth * 0.3));
-                    }
-                    //Drawable drwSquare = ResourcesCompat.getDrawable(getResources(), R.drawable.bigsquare, null);
-                    //drwSquare.setBounds(target);
-                    //drwSquare.draw(canvas);
-                    paint.setColor(Color.argb(255,28,138,91));
-                    canvas.drawRect(target, paint);
-                    paint.setColor(Color.BLACK);
+                //Empty for now, room for a new option
                 } else if(counter == 11){
                     Rect target = new Rect();
                     digit.round(target);
@@ -244,14 +243,16 @@ public class PuzzleView extends View implements View.OnTouchListener{
                             && event.getY() >= board[i][j].top && event.getY() <= board[i][j].bottom){
                         selectedI = i;
                         selectedJ = j;
+                        blnCellSelected = true;
                         end = true;
-                        clickedBoardArea = false;
+                        clickedBoardArea = true;
                         break;
                     }
                 }
                 if(end)
                     break;
             }
+
             end = false;
             for(int i=0;i<2;i++) {
                 for (int j = 0; j < 6; j++) {
@@ -259,18 +260,18 @@ public class PuzzleView extends View implements View.OnTouchListener{
                             && event.getY() >= digits[i][j].top && event.getY() <= digits[i][j].bottom){
                         digitI = i;
                         digitJ = j;
+                        selectedDigit = 6*i + j + 1;
                         end = true;
                         clickedBoardArea = false;
                         clickedDigitArea = true;
                         if(i == 1 && j == 3) {
-                            blnBigSquare = !blnBigSquare;
-                            digitI = -1;
-                            digitJ = -1;
-                        }
-                        else if(i == 1 && j == 5) {
+                            selectedDigit = -1;
+                        } else if(i == 1 && j == 4){
+                            blnEraser = true;
+                            selectedDigit = -1;
+                        } else if(i == 1 && j == 5) {
                             blnCellFirst = !blnCellFirst;
-                            digitI = -1;
-                            digitJ = -1;
+                            selectedDigit = -1;
                         }
 
                         break;
@@ -279,8 +280,45 @@ public class PuzzleView extends View implements View.OnTouchListener{
                 if(end)
                     break;
             }
+
+            if(!blnCellFirst){
+                if(blnCellSelected && clickedBoardArea){
+                    Grid.Cell cell = grid.getCell(selectedI, selectedJ);
+
+                    if (!cell.getPreset()) {
+                        if(selectedDigit != -1 && grid.isValidValueForCell(cell, selectedDigit))
+                            cell.setValue(selectedDigit);
+                        else
+                            cell.setValue(0);
+                    }
+                }
+            }
+            else{
+                if(blnCellSelected && clickedDigitArea){
+                    Grid.Cell cell = grid.getCell(selectedI, selectedJ);
+
+                    if (!cell.getPreset()) {
+                        if(selectedDigit != -1  && grid.isValidValueForCell(cell, selectedDigit))
+                            cell.setValue(selectedDigit);
+                        else
+                            cell.setValue(0);
+                    }
+                }
+            }
         }
         this.invalidate();
         return true;
     }
 }
+
+/**
+ * TODO LIST:
+ * - add option menu
+ *          - draw preset numbers bold
+ *          - refuse wrong answers(stron and weak version)
+ *          - show hint color
+ *          - reset selected digit/cell after filling in a value
+ * - small numbers in the corners
+ * - fix hint coloring
+ * -improve graphics
+ */

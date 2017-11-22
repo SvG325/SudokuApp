@@ -236,9 +236,11 @@ public class Grid {
     private Collection<Cell> columnNeighbors;
     private Collection<Cell> boxNeighbors;
     private Cell nextCell;
+    private boolean preset;
 
     public Cell(int value) {
       this.value = value;
+      preset = true;
     }
 
     /**
@@ -342,6 +344,13 @@ public class Grid {
      */
     public void setNextCell(Cell nextCell) {
       this.nextCell = nextCell;
+    }
+
+    public void setPreset(boolean p) {
+      preset = p;
+    }
+    public boolean getPreset(){
+      return preset;
     }
   }
 

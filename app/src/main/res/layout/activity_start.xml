@@ -4,9 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorNeutral"
     android:orientation="horizontal"
-    tools:background="@color/colorNeutral"
+    android:background="@color/colorDarkBlue"
     tools:context="com.example.stphanie.sudoku.StartActivity">
 
     <RelativeLayout
