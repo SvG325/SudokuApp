@@ -19,7 +19,7 @@ import android.widget.Toast;
  * Created by Stéphanie on 29-10-2017.
  */
 
-public class PuzzleView extends View implements View.OnTouchListener{
+public class ExperimentView extends View implements View.OnTouchListener{
     private Rect[][] board;
     private RectF[][] digits;
     private int selectedI, selectedJ, digitI, digitJ, digitWidth, selectedDigit;
@@ -33,7 +33,7 @@ public class PuzzleView extends View implements View.OnTouchListener{
     int cellWidth;
 
 
-    public PuzzleView(Context context) {
+    public ExperimentView(Context context) {
         super(context);
         board = new Rect[9][9];
         digits = new RectF[2][6];
@@ -324,14 +324,10 @@ public class PuzzleView extends View implements View.OnTouchListener{
                     Grid.Cell cell = grid.getCell(selectedI, selectedJ);
 
                     if (!cell.getPreset()) {
-                        if(selectedDigit != -1  && grid.isValidValueForCell(cell, selectedDigit)) {
+                        if(selectedDigit != -1 && grid.isValidValueForCell(cell, selectedDigit))
                             cell.setValue(selectedDigit);
-                            grid.changeNrOfEmptyCells(-1);
-                        }
-                        else if(blnEraser) {
+                        else if (blnEraser)
                             cell.setValue(0);
-                            grid.changeNrOfEmptyCells(1);
-                        }
                     }
                 }
             }
@@ -340,20 +336,12 @@ public class PuzzleView extends View implements View.OnTouchListener{
                     Grid.Cell cell = grid.getCell(selectedI, selectedJ);
 
                     if (!cell.getPreset()) {
-                        if(selectedDigit != -1  && grid.isValidValueForCell(cell, selectedDigit)) {
+                        if(selectedDigit != -1  && grid.isValidValueForCell(cell, selectedDigit))
                             cell.setValue(selectedDigit);
-                            grid.changeNrOfEmptyCells(-1);
-                        }
-                        else if(blnEraser) {
+                        else if(blnEraser)
                             cell.setValue(0);
-                            grid.changeNrOfEmptyCells(1);
-                        }
                     }
                 }
-            }
-            if(grid.getSolved()){
-                //Puzzle is solved
-                //TODO end activity
             }
         }
         this.invalidate();
