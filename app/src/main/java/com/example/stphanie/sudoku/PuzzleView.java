@@ -15,26 +15,34 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
+
 /**
  * Created by Stéphanie on 29-10-2017.
  */
 
 public class PuzzleView extends View implements View.OnTouchListener{
+    Puzzle puzzle;
     private Rect[][] board;
     private RectF[][] digits;
     private int selectedI, selectedJ, digitI, digitJ, digitWidth, selectedDigit;
-    Grid grid;
     Paint paint;
-    boolean blnEraser;
-    boolean blnCellFirst, blnCellSelected;
-
+    boolean blnRedrawBoard;
+    boolean blnCellFirst, blnCellSelected, blnEraser;
+    String strTimer, strDifficulty;
+    long totalTimePassed;
     int canvasWidth, canvasHeight, puzzleWidth;
     int outerMargin, lineWidthA, lineWidthB;
     int cellWidth;
 
 
-    public PuzzleView(Context context) {
+    public PuzzleView(Context context, Puzzle puzzle) {
         super(context);
+        blnRedrawBoard = true;
+        this.puzzle = puzzle;
         board = new Rect[9][9];
         digits = new RectF[2][6];
         paint = new Paint();
@@ -46,6 +54,9 @@ public class PuzzleView extends View implements View.OnTouchListener{
         blnCellSelected = false;
         blnCellFirst = true;
         blnEraser = false;
+        strTimer = "0:00";
+        totalTimePassed = 0;
+        strDifficulty = puzzle.getDifficulty();
         setOnTouchListener(this);
     }
 
@@ -57,24 +68,26 @@ public class PuzzleView extends View implements View.OnTouchListener{
         canvasHeight = canvas.getHeight();
         puzzleWidth = canvasWidth-2*outerMargin-2*lineWidthA;
         cellWidth = (puzzleWidth-2*lineWidthA-6*lineWidthB)/9;
-
-        paintBoard(canvas);
-        paintNumbers(canvas);
-    }
-
-    private void paintBoard(Canvas canvas){
-        cellWidth = (puzzleWidth-2*lineWidthA-6*lineWidthB)/9;
-        int currX, currY, textHeight;
-        String strTimer = "0:00";
         paint.setColor(Color.BLACK);
         paint.setTextAlign(Paint.Align.LEFT);
 
-        //Top bar (difficulty level, timer, menu icon)
+        paintTopBar(canvas);
+        if(true) {
+            paintBoard(canvas);
+            paintNumbers(canvas);
+            blnRedrawBoard = false;
+        }
+    }
+
+    private void paintTopBar(Canvas canvas){
+        strTimer = puzzle.getStrTimer();
+
+        int currX, currY;
         sizeText((int) (puzzleWidth/15));
-        textHeight = (int) paint.getTextSize();
+        int textHeight = (int) paint.getTextSize();
         currX = outerMargin;
         currY = textHeight+outerMargin;
-        canvas.drawText("Difficulty", currX, currY, paint);
+        canvas.drawText(strDifficulty, currX, currY, paint);
 
         currX = canvasWidth - outerMargin-2*textHeight;
         Drawable menuIcon = getResources().getDrawable(R.drawable.cog);
@@ -85,8 +98,15 @@ public class PuzzleView extends View implements View.OnTouchListener{
         paint.getTextBounds(strTimer, 0 , strTimer.length(), textBounds);
         currX -= textBounds.width() + outerMargin*2;
         canvas.drawText(strTimer, currX, currY, paint);
-        currY += outerMargin;
+
+    }
+
+    private void paintBoard(Canvas canvas){
+        cellWidth = (puzzleWidth-2*lineWidthA-6*lineWidthB)/9;
+        int currX, currY, textHeight;
+        textHeight = (int) paint.getTextSize();
         currX = outerMargin;
+        currY = textHeight+2*outerMargin;
 
         //Draw the board outline
         paint.setColor(Color.parseColor("#759dd1"));
@@ -108,7 +128,7 @@ public class PuzzleView extends View implements View.OnTouchListener{
                     } else
                         paint.setColor(Color.WHITE);
                 }else{
-                    if(selectedDigit != -1 && grid.getCell(i,j).getValue() == selectedDigit)
+                    if(selectedDigit != -1 && puzzle.getGrid().getCell(i,j).getValue() == selectedDigit)
                         paint.setColor(Color.parseColor("#d1d175"));
                     else
                         paint.setColor(Color.WHITE);
@@ -179,7 +199,7 @@ public class PuzzleView extends View implements View.OnTouchListener{
     }
 
     private  void paintNumbers(Canvas canvas){
-        if(grid == null)
+        if(puzzle.getGrid() == null)
             return;
         paint.setColor(Color.BLACK);
         paint.setTextAlign(Paint.Align.CENTER);
@@ -193,9 +213,9 @@ public class PuzzleView extends View implements View.OnTouchListener{
                 Rect gc = board[i][j];
                 paint.getTextBounds(text, 0, text.length(), r);
                 yPos = gc.top + r.height() + ((cellWidth- r.height())/2);
-                int value = grid.getCell(i,j).getValue();
+                int value = puzzle.getGrid().getCell(i,j).getValue();
                 if(value != 0) {
-                    if(grid.getCell(i,j).getPreset())
+                    if(puzzle.getGrid().getCell(i,j).getPreset())
                         paint.setColor(Color.BLACK);
                     else
                         paint.setColor(Color.rgb(102,102,153));
@@ -255,10 +275,6 @@ public class PuzzleView extends View implements View.OnTouchListener{
     }
 
 
-    public void setGrid(Grid g){
-        grid = g;
-    }
-
     public void setSelectedI(int I){
         selectedI = I;
     }
@@ -275,6 +291,7 @@ public class PuzzleView extends View implements View.OnTouchListener{
             boolean end = false;
             boolean clickedBoardArea = false;
             boolean clickedDigitArea = false;
+            blnRedrawBoard = true;
             for(int i=0;i<9;i++){
                 for(int j=0; j<9;j++){
                     if(event.getX() >= board[i][j].left && event.getX() <= board[i][j].right
@@ -321,37 +338,25 @@ public class PuzzleView extends View implements View.OnTouchListener{
 
             if(!blnCellFirst){
                 if(blnCellSelected && clickedBoardArea){
-                    Grid.Cell cell = grid.getCell(selectedI, selectedJ);
+                    Grid.Cell cell = puzzle.getCell(selectedI, selectedJ);
 
-                    if (!cell.getPreset()) {
-                        if(selectedDigit != -1  && grid.isValidValueForCell(cell, selectedDigit)) {
-                            cell.setValue(selectedDigit);
-                            grid.changeNrOfEmptyCells(-1);
-                        }
-                        else if(blnEraser) {
-                            cell.setValue(0);
-                            grid.changeNrOfEmptyCells(1);
-                        }
-                    }
+                    if(selectedDigit != -1)
+                        puzzle.fillInCell(selectedI, selectedJ, selectedDigit);
+                    else if(blnEraser)
+                        puzzle.eraseCell(selectedI,selectedJ);
                 }
             }
             else{
                 if(blnCellSelected && clickedDigitArea){
-                    Grid.Cell cell = grid.getCell(selectedI, selectedJ);
+                    Grid.Cell cell = puzzle.getCell(selectedI, selectedJ);
 
-                    if (!cell.getPreset()) {
-                        if(selectedDigit != -1  && grid.isValidValueForCell(cell, selectedDigit)) {
-                            cell.setValue(selectedDigit);
-                            grid.changeNrOfEmptyCells(-1);
-                        }
-                        else if(blnEraser) {
-                            cell.setValue(0);
-                            grid.changeNrOfEmptyCells(1);
-                        }
-                    }
+                    if(selectedDigit != -1)
+                        puzzle.fillInCell(selectedI, selectedJ, selectedDigit);
+                    else if(blnEraser)
+                        puzzle.eraseCell(selectedI,selectedJ);
                 }
             }
-            if(grid.getSolved()){
+            if(puzzle.isSolved()){
                 //Puzzle is solved
                 //TODO end activity
             }

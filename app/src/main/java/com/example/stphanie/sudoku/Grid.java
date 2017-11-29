@@ -13,12 +13,8 @@ import java.util.stream.Collectors;
 public class Grid {
 
   private final Cell[][] grid;
-    private int nrEmptyCells;
-    private boolean solved;
 
   private Grid(Cell[][] grid) {
-      nrEmptyCells = 81;
-      solved = false;
       this.grid = grid;
   }
 
@@ -221,20 +217,6 @@ public class Grid {
     return Optional.ofNullable(nextEmptyCell);
   }
 
-  public int getNrEmptyCells(){
-      return nrEmptyCells;
-  }
-  public void setNrEmptyCells(int nr){
-      nrEmptyCells = nr;
-  }
-  public void changeNrOfEmptyCells(int delta){
-      nrEmptyCells += delta;
-      if(nrEmptyCells == 0)
-          solved = true;
-  }
-  public boolean getSolved(){
-      return solved;
-  }
 
   /**
    * Returns a {@link String} representation of this Grid.

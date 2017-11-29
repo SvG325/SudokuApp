@@ -26,7 +26,6 @@ public class Generator {
     Grid grid = generate();
 
     eraseCells(grid, numberOfEmptyCells);
-    grid.setNrEmptyCells(numberOfEmptyCells);
 
     return grid;
   }

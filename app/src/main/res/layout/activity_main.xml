@@ -7,9 +7,14 @@
     android:background="@drawable/bg3"
     tools:context="com.example.stphanie.sudoku.MainActivity">
 
-
-    <SurfaceView
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="100dp"
+        android:id="@+id/tvTimer"
+        android:text="test"/>
+    <PuzzleView
         android:id="@+id/svPuzzle"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_below="@+id/tvTimer"/>
 </RelativeLayout>
